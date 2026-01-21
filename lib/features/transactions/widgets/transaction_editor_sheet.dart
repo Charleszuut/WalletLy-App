@@ -143,7 +143,7 @@ class _TransactionEditorSheetState extends State<TransactionEditorSheet> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _categoryId,
+              initialValue: _categoryId,
               items: categories
                   .map(
                     (category) => DropdownMenuItem(

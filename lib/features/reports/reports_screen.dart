@@ -6,6 +6,8 @@ import '../../data/models/category_total.dart';
 import '../../data/models/monthly_totals.dart';
 import '../../data/providers/finance_provider.dart';
 import '../../utils/formatters.dart';
+import '../../theme/walletlly_palette.dart';
+import '../../widgets/walletlly_brand_banner.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -34,20 +36,38 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
 
     final theme = Theme.of(context);
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(
-          title: const Text('Reports & Insights'),
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
-          elevation: 0,
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+    final palette = WalletllyPalette.of(context);
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              WalletllyBrandBanner(
+                compact: true,
+                title: 'Reports & Insights',
+                subtitle: 'Visualise spending, income, and balance trends',
+                trailing: FilledButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.share_outlined),
+                  label: const Text('Export'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: palette.primaryBase,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                    textStyle: theme.textTheme.labelLarge,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               _ReportsHeader(
                 months: months,
                 selectedMonth: selectedMonth,
@@ -118,6 +138,7 @@ class _ReportsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final palette = WalletllyPalette.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 520;
@@ -129,7 +150,7 @@ class _ReportsHeader extends StatelessWidget {
               'Dive into your spending habits',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF1F2937),
+                color: theme.colorScheme.onSurface,
                 fontSize: 16,
               ),
             ),
@@ -137,7 +158,7 @@ class _ReportsHeader extends StatelessWidget {
             Text(
               'Understand where your money goes and how your savings evolve.',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: const Color(0xFF6B7280),
+                color: theme.colorScheme.onSurfaceVariant,
                 height: 1.4,
               ),
             ),
@@ -148,9 +169,9 @@ class _ReportsHeader extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 220),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x0F000000),
@@ -166,12 +187,15 @@ class _ReportsHeader extends StatelessWidget {
                   value: selectedMonth,
                   isExpanded: true,
                   borderRadius: BorderRadius.circular(16),
-                  dropdownColor: Colors.white,
+                  dropdownColor: theme.colorScheme.surface,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF1F2937),
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
                   ),
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                  icon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: palette.primaryBase,
+                  ),
                   onChanged: onMonthChanged,
                   items: [
                     const DropdownMenuItem<DateTime?>(
@@ -195,16 +219,17 @@ class _ReportsHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [header, const SizedBox(height: 16), dropdown],
           );
+        } else {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: header),
+              const SizedBox(width: 20),
+              dropdown,
+            ],
+          );
         }
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: header),
-            const SizedBox(width: 24),
-            dropdown,
-          ],
-        );
       },
     );
   }
@@ -339,13 +364,13 @@ class _MonthlyBarChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: entry.value.income,
-                color: const Color(0xFF22C55E),
+                color: WalletllyPalette.of(context).success,
                 width: 14,
                 borderRadius: BorderRadius.circular(6),
               ),
               BarChartRodData(
                 toY: entry.value.expenses,
-                color: const Color(0xFFEF4444),
+                color: Theme.of(context).colorScheme.error,
                 width: 14,
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -434,12 +459,18 @@ class _MonthlyBarChart extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _LegendChip(color: Color(0xFF22C55E), label: 'Income'),
-              SizedBox(width: 12),
-              _LegendChip(color: Color(0xFFEF4444), label: 'Expenses'),
+              _LegendChip(
+                color: WalletllyPalette.of(context).success,
+                label: 'Income',
+              ),
+              const SizedBox(width: 12),
+              _LegendChip(
+                color: Theme.of(context).colorScheme.error,
+                label: 'Expenses',
+              ),
             ],
           ),
         ],
@@ -527,8 +558,12 @@ class _InsightChip extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: const Color(0xFFEFF6FF),
-            child: Icon(icon, size: 18, color: const Color(0xFF2563EB)),
+            backgroundColor: WalletllyPalette.of(context).primaryLight,
+            child: Icon(
+              icon,
+              size: 18,
+              color: WalletllyPalette.of(context).primaryBase,
+            ),
           ),
           const SizedBox(width: 12),
           Column(
@@ -567,12 +602,13 @@ class _LegendChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: theme.colorScheme.surface,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -581,8 +617,8 @@ class _LegendChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFF4B5563),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -590,8 +626,8 @@ class _LegendChip extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               value!,
-              style: const TextStyle(
-                color: Color(0xFF1F2937),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),

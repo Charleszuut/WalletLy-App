@@ -10,6 +10,8 @@ class WalletllyPalette extends ThemeExtension<WalletllyPalette> {
     required this.accentSoft,
     required this.success,
     required this.successContainer,
+    required this.error,
+    required this.errorSoft,
   });
 
   final Color primaryDark;
@@ -19,6 +21,8 @@ class WalletllyPalette extends ThemeExtension<WalletllyPalette> {
   final Color accentSoft;
   final Color success;
   final Color successContainer;
+  final Color error;
+  final Color errorSoft;
 
   static WalletllyPalette of(BuildContext context) =>
       Theme.of(context).extension<WalletllyPalette>()!;
@@ -32,6 +36,8 @@ class WalletllyPalette extends ThemeExtension<WalletllyPalette> {
     Color? accentSoft,
     Color? success,
     Color? successContainer,
+    Color? error,
+    Color? errorSoft,
   }) {
     return WalletllyPalette(
       primaryDark: primaryDark ?? this.primaryDark,
@@ -41,6 +47,8 @@ class WalletllyPalette extends ThemeExtension<WalletllyPalette> {
       accentSoft: accentSoft ?? this.accentSoft,
       success: success ?? this.success,
       successContainer: successContainer ?? this.successContainer,
+      error: error ?? this.error,
+      errorSoft: errorSoft ?? this.errorSoft,
     );
   }
 
@@ -59,6 +67,8 @@ class WalletllyPalette extends ThemeExtension<WalletllyPalette> {
         other.successContainer,
         t,
       )!,
+      error: Color.lerp(error, other.error, t)!,
+      errorSoft: Color.lerp(errorSoft, other.errorSoft, t)!,
     );
   }
 }

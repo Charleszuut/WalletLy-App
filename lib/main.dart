@@ -12,6 +12,7 @@ import 'data/repositories/category_repository.dart';
 import 'data/repositories/transaction_repository.dart';
 import 'data/services/hive_service.dart';
 import 'features/home/home_shell.dart';
+import 'theme/walletlly_palette.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,102 +57,144 @@ class FinanceTrackerApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme() {
-    final baseScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF2563EB),
+    const palette = WalletllyPalette(
+      primaryDark: Color(0xFF1E3A8A),
+      primaryBase: Color(0xFF2563EB),
+      primaryLight: Color(0xFFE2EAFF),
+      accent: Color(0xFF14B8A6),
+      accentSoft: Color(0xFFD5F5EF),
+      success: Color(0xFF16A34A),
+      successContainer: Color(0xFFD1FAE5),
+      error: Color(0xFFDC2626),
+      errorSoft: Color(0xFFFEE2E2),
+    );
+
+    final colorScheme = ColorScheme(
       brightness: Brightness.light,
+      primary: palette.primaryBase,
+      onPrimary: Colors.white,
+      primaryContainer: palette.primaryLight,
+      onPrimaryContainer: palette.primaryDark,
+      secondary: const Color(0xFF4B5563),
+      onSecondary: Colors.white,
+      secondaryContainer: const Color(0xFFE5E7EB),
+      onSecondaryContainer: const Color(0xFF111827),
+      tertiary: palette.accent,
+      onTertiary: Colors.white,
+      tertiaryContainer: palette.accentSoft,
+      onTertiaryContainer: palette.accent,
+      error: palette.error,
+      onError: Colors.white,
+      errorContainer: palette.errorSoft,
+      onErrorContainer: const Color(0xFF7F1D1D),
+      background: const Color(0xFFF5F7FB),
+      onBackground: const Color(0xFF1F2937),
+      surface: Colors.white,
+      onSurface: const Color(0xFF1F2937),
+      surfaceVariant: const Color(0xFFE5E7EB),
+      onSurfaceVariant: const Color(0xFF4B5563),
+      outline: const Color(0xFFD1D5DB),
+      outlineVariant: const Color(0xFFE2E8F0),
+      shadow: const Color(0x33000000),
+      scrim: const Color(0x66000000),
+      inverseSurface: const Color(0xFF1F2937),
+      onInverseSurface: Colors.white,
+      inversePrimary: palette.primaryDark,
+      surfaceTint: palette.primaryBase,
     );
 
     final textTheme = GoogleFonts.spaceGroteskTextTheme();
 
     return ThemeData(
       useMaterial3: true,
-      colorScheme: baseScheme,
-      scaffoldBackgroundColor: const Color(0xFFF5F7FB),
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.background,
       textTheme: textTheme.copyWith(
         bodyLarge: textTheme.bodyLarge?.copyWith(
-          color: const Color(0xFF1F2937),
+          color: colorScheme.onBackground,
         ),
         bodyMedium: textTheme.bodyMedium?.copyWith(
-          color: const Color(0xFF4B5563),
+          color: colorScheme.onSurfaceVariant,
         ),
         bodySmall: textTheme.bodySmall?.copyWith(
           color: const Color(0xFF6B7280),
         ),
         titleLarge: textTheme.titleLarge?.copyWith(
-          color: const Color(0xFF1F2937),
+          color: colorScheme.onSurface,
         ),
         titleMedium: textTheme.titleMedium?.copyWith(
-          color: const Color(0xFF1F2937),
+          color: colorScheme.onSurface,
         ),
         titleSmall: textTheme.titleSmall?.copyWith(
-          color: const Color(0xFF1F2937),
+          color: colorScheme.onSurface,
         ),
         headlineSmall: textTheme.headlineSmall?.copyWith(
-          color: const Color(0xFF1F2937),
+          color: colorScheme.onSurface,
         ),
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Color(0xFF1F2937),
+        foregroundColor: colorScheme.onSurface,
         centerTitle: true,
-        titleTextStyle: TextStyle(
+        titleTextStyle: textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w600,
           fontSize: 20,
-          color: Color(0xFF1F2937),
+          color: colorScheme.onSurface,
         ),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: colorScheme.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: const Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: const Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: baseScheme.primary, width: 1.6),
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.6),
         ),
-        labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: baseScheme.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       dividerTheme: DividerThemeData(
-        color: const Color(0xFFE5E7EB),
+        color: colorScheme.outlineVariant,
         thickness: 1,
         space: 1,
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: const Color(0xFFE5E7EB),
-        selectedColor: baseScheme.primary.withValues(alpha: 0.15),
-        labelStyle: const TextStyle(color: Color(0xFF1F2937)),
+        backgroundColor: colorScheme.secondaryContainer,
+        selectedColor: palette.primaryLight,
+        labelStyle: TextStyle(color: colorScheme.onSurface),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         side: BorderSide.none,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.white,
-        selectedItemColor: baseScheme.primary,
-        unselectedItemColor: const Color(0xFF9CA3AF),
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
         type: BottomNavigationBarType.fixed,
       ),
+      extensions: const [palette],
     );
   }
 }

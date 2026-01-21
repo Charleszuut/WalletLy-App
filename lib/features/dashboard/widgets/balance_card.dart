@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../theme/walletlly_palette.dart';
 import '../../../utils/formatters.dart';
 
 class BalanceCard extends StatelessWidget {
@@ -9,20 +10,22 @@ class BalanceCard extends StatelessWidget {
     required this.balance,
     required this.income,
     required this.expenses,
+    this.onAdd,
   });
 
   final double balance;
   final double income;
   final double expenses;
+  final VoidCallback? onAdd;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final palette = WalletllyPalette.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+          colors: [palette.primaryDark, palette.primaryBase],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -38,15 +41,44 @@ class BalanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Current Balance',
-            style: GoogleFonts.spaceGrotesk(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  'Current Balance',
+                  style: GoogleFonts.spaceGrotesk(
+                    color: palette.primaryLight.withValues(alpha: 0.9),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              if (onAdd != null)
+                ElevatedButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add'),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.white.withOpacity(0.16),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    textStyle: GoogleFonts.spaceGrotesk(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             Formatters.currency.format(balance),
             style: GoogleFonts.spaceGrotesk(
@@ -59,11 +91,15 @@ class BalanceCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildStat(label: 'Income', amount: income, color: Colors.white),
+              _buildStat(
+                label: 'Income',
+                amount: income,
+                color: palette.primaryLight,
+              ),
               _buildStat(
                 label: 'Expenses',
                 amount: expenses,
-                color: Colors.white,
+                color: palette.accentSoft,
               ),
             ],
           ),
@@ -83,7 +119,7 @@ class BalanceCard extends StatelessWidget {
         Text(
           label,
           style: GoogleFonts.spaceGrotesk(
-            color: color.withValues(alpha: 0.7),
+            color: color.withValues(alpha: 0.8),
             fontSize: 12,
             fontWeight: FontWeight.w400,
           ),
@@ -92,7 +128,7 @@ class BalanceCard extends StatelessWidget {
         Text(
           _formatCurrency(amount),
           style: GoogleFonts.spaceGrotesk(
-            color: color,
+            color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

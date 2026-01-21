@@ -7,6 +7,8 @@ import '../../data/models/transaction_type.dart';
 import '../../data/providers/finance_provider.dart';
 import '../../utils/formatters.dart';
 import 'widgets/transaction_editor_sheet.dart';
+import '../../theme/walletlly_palette.dart';
+import '../../widgets/walletlly_brand_banner.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -39,82 +41,62 @@ class _TransactionsScreenState extends State<TransactionsScreen>
     final transactions = _filteredTransactions(finance.transactions);
 
     final theme = Theme.of(context);
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(142),
-          child: Container(
+    final palette = WalletllyPalette.of(context);
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(200),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-            decoration: const BoxDecoration(color: Colors.white),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Transactions',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1F2937),
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () => _openFilterSheet(context, finance),
-                      icon: const Icon(Icons.tune),
-                      tooltip: 'Filters',
-                    ),
-                    const SizedBox(width: 6),
-                    FilledButton.icon(
-                      onPressed: () => TransactionEditorSheet.show(context),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Add'),
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        textStyle: theme.textTheme.labelLarge,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
-                  ],
+                WalletllyBrandBanner(
+                  compact: true,
+                  trailing: IconButton(
+                    onPressed: () => _openFilterSheet(context, finance),
+                    icon: const Icon(Icons.tune),
+                    color: Colors.white,
+                    tooltip: 'Filters',
+                  ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(20),
+                    color: palette.primaryLight,
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  child: SizedBox(
-                    height: 46,
-                    child: TabBar(
-                      controller: _tabController,
-                      labelColor: theme.colorScheme.primary,
-                      unselectedLabelColor: const Color(0xFF6B7280),
-                      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      indicator: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      tabs: const [
-                        Tab(text: 'List View'),
-                        Tab(text: 'Insights'),
-                      ],
+                  padding: const EdgeInsets.all(4),
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: palette.primaryBase,
+                    unselectedLabelColor: palette.primaryDark.withOpacity(0.65),
+                    labelStyle: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
+                    indicator: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicatorPadding: EdgeInsets.zero,
+                    tabs: const [
+                      Tab(text: 'List View'),
+                      Tab(text: 'Insights'),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ),
-        body: TabBarView(
+      ),
+      body: SafeArea(
+        top: false,
+        child: TabBarView(
           controller: _tabController,
           children: [
             _TransactionsList(
@@ -130,12 +112,6 @@ class _TransactionsScreenState extends State<TransactionsScreen>
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => TransactionEditorSheet.show(context),
-          label: const Text('Quick Add'),
-          icon: const Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -274,6 +250,7 @@ class _TransactionsList extends StatelessWidget {
         final category = context.read<FinanceProvider>().categoryById(
           entry.categoryId,
         );
+        final palette = WalletllyPalette.of(context);
         final isIncome = entry.type == TransactionType.income;
         final sign = isIncome ? '+' : '-';
         return InkWell(
@@ -282,7 +259,7 @@ class _TransactionsList extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(
@@ -296,7 +273,7 @@ class _TransactionsList extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: category?.color ?? theme.colorScheme.primary,
+                  backgroundColor: category?.color ?? palette.primaryBase,
                   child: Icon(
                     isIncome ? Icons.arrow_downward : Icons.arrow_upward,
                     color: Colors.white,
@@ -339,9 +316,7 @@ class _TransactionsList extends StatelessWidget {
                 Text(
                   '$sign${Formatters.currency.format(entry.amount.abs())}',
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: isIncome
-                        ? const Color(0xFF16A34A)
-                        : const Color(0xFFDC2626),
+                    color: isIncome ? palette.success : theme.colorScheme.error,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -384,8 +359,9 @@ class _TransactionsSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 40 + bottomInset),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -406,19 +382,21 @@ class _TransactionsSummary extends StatelessWidget {
           _SummaryTile(
             label: 'Income',
             amount: totalIncome,
-            color: Colors.tealAccent,
+            color: WalletllyPalette.of(context).primaryBase,
           ),
           const SizedBox(height: 16),
           _SummaryTile(
             label: 'Expenses',
             amount: totalExpenses,
-            color: Colors.pinkAccent,
+            color: theme.colorScheme.error,
           ),
           const SizedBox(height: 16),
           _SummaryTile(
             label: 'Balance',
             amount: balance,
-            color: balance >= 0 ? Colors.tealAccent : Colors.pinkAccent,
+            color: balance >= 0
+                ? WalletllyPalette.of(context).accent
+                : theme.colorScheme.error,
           ),
         ],
       ),
@@ -445,7 +423,7 @@ class _SummaryTile extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         boxShadow: const [
           BoxShadow(
             color: Color(0x11000000),
@@ -461,7 +439,10 @@ class _SummaryTile extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             Formatters.currency.format(amount),
-            style: theme.textTheme.headlineSmall?.copyWith(color: color),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: color,
+              fontSize: 22,
+            ),
           ),
         ],
       ),
