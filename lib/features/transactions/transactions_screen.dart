@@ -227,6 +227,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>
   }
 }
 
+enum _TransactionAction { edit, delete }
+
 class _TransactionsList extends StatelessWidget {
   const _TransactionsList({required this.transactions, required this.onEdit});
 
@@ -270,9 +272,10 @@ class _TransactionsList extends StatelessWidget {
               ],
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  radius: 18,
+                  radius: 20,
                   backgroundColor: category?.color ?? palette.primaryBase,
                   child: Icon(
                     isIncome ? Icons.arrow_downward : Icons.arrow_upward,
@@ -283,54 +286,97 @@ class _TransactionsList extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         category?.name ?? 'Uncategorized',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF1F2937),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         DateFormat.yMMMd().format(entry.date),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 12,
                           color: const Color(0xFF6B7280),
                         ),
                       ),
                       if (entry.notes?.isNotEmpty ?? false) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Text(
                           entry.notes!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: const Color(0xFF9CA3AF),
-                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 12,
+                            color: const Color(0xFF9CA3AF),
+                          ),
                         ),
                       ],
                     ],
                   ),
                 ),
                 const SizedBox(width: 16),
-                Text(
-                  '$sign${Formatters.currency.format(entry.amount.abs())}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: isIncome ? palette.success : theme.colorScheme.error,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                IconButton(
-                  onPressed: () => onEdit(entry),
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit',
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  onPressed: () => _confirmDelete(context, entry),
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Delete',
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    PopupMenuButton<_TransactionAction>(
+                      tooltip: 'More actions',
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: palette.primaryDark.withOpacity(0.72),
+                      ),
+                      onSelected: (action) {
+                        switch (action) {
+                          case _TransactionAction.edit:
+                            onEdit(entry);
+                          case _TransactionAction.delete:
+                            _confirmDelete(context, entry);
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: _TransactionAction.edit,
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_outlined, size: 18),
+                              SizedBox(width: 12),
+                              Text('Edit'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: _TransactionAction.delete,
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_outline, size: 18),
+                              SizedBox(width: 12),
+                              Text('Delete'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '$sign${Formatters.currency.format(entry.amount.abs())}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontSize: 18,
+                        color: isIncome
+                            ? palette.success
+                            : theme.colorScheme.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
