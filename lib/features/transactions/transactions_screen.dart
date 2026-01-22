@@ -11,7 +11,9 @@ import '../../theme/walletlly_palette.dart';
 import '../../widgets/walletlly_brand_banner.dart';
 
 class TransactionsScreen extends StatefulWidget {
-  const TransactionsScreen({super.key});
+  const TransactionsScreen({super.key, this.showBackButton = false});
+
+  final bool showBackButton;
 
   @override
   State<TransactionsScreen> createState() => _TransactionsScreenState();
@@ -42,6 +44,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>
 
     final theme = Theme.of(context);
     final palette = WalletllyPalette.of(context);
+    final routeCanPop = ModalRoute.of(context)?.canPop ?? false;
+    final showBack = widget.showBackButton || routeCanPop;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: PreferredSize(
@@ -113,6 +117,17 @@ class _TransactionsScreenState extends State<TransactionsScreen>
           ],
         ),
       ),
+      bottomNavigationBar: showBack
+          ? SafeArea(
+              top: false,
+              minimum: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: FilledButton.icon(
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_ios_new),
+                label: const Text('Back to Dashboard'),
+              ),
+            )
+          : null,
     );
   }
 

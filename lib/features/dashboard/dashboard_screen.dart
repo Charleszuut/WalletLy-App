@@ -5,6 +5,7 @@ import '../../data/models/transaction_type.dart';
 import '../../data/providers/finance_provider.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/walletlly_brand_banner.dart';
+import '../transactions/transactions_screen.dart';
 import '../transactions/widgets/transaction_editor_sheet.dart';
 import 'widgets/balance_card.dart';
 import 'widgets/summary_tiles.dart';
@@ -63,7 +64,14 @@ class DashboardScreen extends StatelessWidget {
                 _SectionHeader(
                   title: 'Recent Transactions',
                   trailing: TextButton(
-                    onPressed: () => TransactionEditorSheet.show(context),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const TransactionsScreen(showBackButton: true),
+                        ),
+                      );
+                    },
                     child: const Text('View All'),
                   ),
                 ),
@@ -72,7 +80,7 @@ class DashboardScreen extends StatelessWidget {
                   _EmptyState(
                     icon: Icons.receipt_long,
                     message:
-                        'No transactions yet. Tap "View All" to add your first entry.',
+                        'No transactions yet. Use the Quick Add button below to create your first entry.',
                   )
                 else
                   ListView.separated(

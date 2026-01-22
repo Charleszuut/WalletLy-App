@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../data/models/category.dart';
 import '../../../data/models/transaction_type.dart';
 import '../../../data/providers/finance_provider.dart';
+import '../../../theme/walletlly_palette.dart';
 
 class CategoryEditorSheet extends StatefulWidget {
   const CategoryEditorSheet({super.key, this.initial});
@@ -18,12 +19,7 @@ class CategoryEditorSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: CategoryEditorSheet(initial: initial),
-      ),
+      builder: (_) => CategoryEditorSheet(initial: initial),
     );
   }
 
@@ -67,110 +63,172 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final palette = WalletllyPalette.of(context);
     final isEditing = widget.initial != null;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  isEditing ? 'Edit Category' : 'New Category',
-                  style: theme.textTheme.headlineSmall,
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ToggleButtons(
-              isSelected: [
-                _type == TransactionType.income,
-                _type == TransactionType.expense,
-              ],
-              borderRadius: BorderRadius.circular(16),
-              constraints: const BoxConstraints(minHeight: 42, minWidth: 120),
-              onPressed: (index) {
-                setState(() {
-                  _type = index == 0
-                      ? TransactionType.income
-                      : TransactionType.expense;
-                });
-              },
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Income'),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Expense'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Enter a category name';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Color',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: Colors.white70,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                for (final color in _colors)
-                  GestureDetector(
-                    onTap: () => setState(() => _color = color),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.all(4),
+    final inputDecoration = theme.inputDecorationTheme.copyWith(
+      filled: true,
+      fillColor: theme.colorScheme.surface,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: palette.primaryLight.withOpacity(0.4)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: palette.primaryLight.withOpacity(0.4)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: palette.primaryBase),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      labelStyle: theme.textTheme.labelLarge?.copyWith(
+        color: palette.primaryDark.withOpacity(0.72),
+      ),
+    );
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+          child: Theme(
+            data: theme.copyWith(inputDecorationTheme: inputDecoration),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: _color == color
-                              ? Colors.white
-                              : Colors.transparent,
-                          width: 2,
-                        ),
+                        color: palette.primaryLight.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(3),
                       ),
-                      child: CircleAvatar(radius: 18, backgroundColor: color),
                     ),
                   ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _submit(context),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(isEditing ? 'Save Changes' : 'Create Category'),
+                  Row(
+                    children: [
+                      Text(
+                        isEditing ? 'Edit Category' : 'New Category',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: palette.primaryDark,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        tooltip: 'Close',
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SegmentedButton<TransactionType>(
+                    segments: const [
+                      ButtonSegment(
+                        value: TransactionType.income,
+                        label: Text('Income'),
+                        icon: Icon(Icons.arrow_downward_rounded, size: 16),
+                      ),
+                      ButtonSegment(
+                        value: TransactionType.expense,
+                        label: Text('Expense'),
+                        icon: Icon(Icons.arrow_upward_rounded, size: 16),
+                      ),
+                    ],
+                    selected: {_type},
+                    showSelectedIcon: false,
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      side: MaterialStateProperty.resolveWith(
+                        (states) => BorderSide(
+                          color: states.contains(MaterialState.selected)
+                              ? palette.primaryBase
+                              : palette.primaryLight.withOpacity(0.7),
+                        ),
+                      ),
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => states.contains(MaterialState.selected)
+                            ? palette.primaryBase
+                            : palette.primaryLight,
+                      ),
+                      foregroundColor: MaterialStateProperty.resolveWith(
+                        (states) => states.contains(MaterialState.selected)
+                            ? Colors.white
+                            : palette.primaryDark,
+                      ),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    onSelectionChanged: (selection) =>
+                        setState(() => _type = selection.first),
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(labelText: 'Name'),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Enter a category name';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 22),
+                  Text(
+                    'Color',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: palette.primaryDark.withOpacity(0.72),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      for (final color in _colors)
+                        _ColorChip(
+                          color: color,
+                          selected: _color == color,
+                          onTap: () => setState(() => _color = color),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  FilledButton.icon(
+                    onPressed: () => _submit(context),
+                    icon: Icon(isEditing ? Icons.save_rounded : Icons.add),
+                    label: Text(isEditing ? 'Save Changes' : 'Create Category'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      textStyle: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -191,5 +249,46 @@ class _CategoryEditorSheetState extends State<CategoryEditorSheet> {
       await provider.addCategory(name: name, type: _type, color: _color);
     }
     if (mounted) Navigator.of(context).pop();
+  }
+}
+
+class _ColorChip extends StatelessWidget {
+  const _ColorChip({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = WalletllyPalette.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        padding: const EdgeInsets.all(3.5),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? palette.primaryBase : Colors.transparent,
+            width: 3,
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: palette.primaryBase.withOpacity(0.25),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: CircleAvatar(radius: 18, backgroundColor: color),
+      ),
+    );
   }
 }

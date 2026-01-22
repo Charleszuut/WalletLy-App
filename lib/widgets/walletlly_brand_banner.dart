@@ -8,12 +8,14 @@ class WalletllyBrandBanner extends StatelessWidget {
     this.title = 'Walletlly',
     this.subtitle = 'Personal finance made simple',
     this.compact = false,
+    this.leading,
     this.trailing,
   });
 
   final String title;
   final String subtitle;
   final bool compact;
+  final Widget? leading;
   final Widget? trailing;
 
   @override
@@ -43,6 +45,10 @@ class WalletllyBrandBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
+          if (leading != null) ...[
+            leading!,
+            SizedBox(width: compact ? 10 : 14),
+          ],
           Container(
             height: iconSize,
             width: iconSize,
